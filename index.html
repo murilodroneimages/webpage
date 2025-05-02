@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Murilo Drone Images</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 1rem 0;
+      background: rgba(0, 0, 0, 0.4);
+      color: white;
+      text-align: center;
+      font-size: 1.5rem;
+      z-index: 1000;
+      backdrop-filter: blur(6px);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+    .whatsapp-link {
+      position: absolute;
+      right: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    .whatsapp-link img {
+      width: 32px;
+      height: 32px;
+    }
+    section {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 4rem 1rem 2rem;
+    }
+    video.bg-video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+    .content {
+      position: relative;
+      z-index: 2;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 2rem;
+      border-radius: 12px;
+      max-width: 90%;
+    }
+    @media (min-width: 768px) {
+      header h1 {
+        font-size: 1.8rem;
+      }
+      .content {
+        max-width: 600px;
+        font-size: 1.2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Murilo Drone Images</h1>
+    <a href="https://wa.me/5541991042120" target="_blank" class="whatsapp-link" aria-label="Fale conosco no WhatsApp">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" />
+    </a>
+  </header>
+ 
+  <section>
+    <video class="bg-video" autoplay muted loop>
+      <source src="movies/por-do-sol-morro-l200.mp4" type="video/mp4" />
+      Seu navegador não suporta vídeos HTML5.
+    </video>
+    <div class="content">
+      <h1>Guarde suas realizações</h1>
+      <br/>
+      <p>Uma imagem pode valer mais que MIL palavras.</p>
+    </div>
+  </section>
+
+  <section>
+    <video class="bg-video" autoplay muted loop>
+      <source src="movies/igreja-STI-drone-dji.mp4" type="video/mp4" />
+      Seu navegador não suporta vídeos HTML5.
+    </video>
+    <div class="content">
+      <h1>SIM</h1>
+      <p>Agora podemos ver tudo de cima.</p>
+      <p>Uma outra pespectiva.</p>
+    </div>
+  </section>
+
+  <section>
+    <video class="bg-video" autoplay muted loop>
+      <source src="movies/sitio-meg-ticotico-rubi-bambu.mp4" type="video/mp4" />
+      Seu navegador não suporta vídeos HTML5.
+    </video>
+    <div class="content">
+      <h1>Sua área rural</h1>
+      <p>Além de manter as imagens como histórico</p>
+      <p>você pode acompanhar e observar suas</p>
+      <p>plantações, desenvolvimento de áreas e </p>
+      <p>o que for interessante para seu agronegócio. </p>
+    </div>
+  </section>
+
+ <footer>
+  <div class="social-links">
+    <a href="https://www.instagram.com/murilodroneimages/" target="_blank" aria-label="Instagram">
+      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
+    </a>
+    <a href="https://www.facebook.com/profile.php?id=61575882148240" target="_blank" aria-label="Facebook">
+      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+    </a>
+    <a href="https://www.youtube.com/@MuriloDroneImages" target="_blank" aria-label="YouTube">
+      <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube">
+    </a>
+  </div>
+  <p>&copy; 2025 Murilo Drone Images. Todos os direitos reservados.</p>
+</footer>
+
+<style>
+  footer {
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    text-align: center;
+    padding: 1.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .social-links {
+    margin-bottom: 0.5rem;
+  }
+
+  .social-links a {
+    margin: 0 0.5rem;
+    display: inline-block;
+  }
+
+  .social-links img {
+    width: 28px;
+    height: 28px;
+    vertical-align: middle;
+  }
+</style>
+
+</body>
+</html>
+
