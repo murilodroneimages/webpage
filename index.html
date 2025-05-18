@@ -19,27 +19,40 @@
       top: 0;
       left: 0;
       width: 100%;
-      padding: 1rem 0;
+      padding: 1rem;
       background: rgba(0, 0, 0, 0.4);
       color: white;
-      text-align: center;
-      font-size: 1.5rem;
       z-index: 1000;
       backdrop-filter: blur(6px);
     }
-    header h1 {
-      margin: 0;
+    .header-container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .social-header a {
+      margin-right: 0.5rem;
+    }
+    .social-header img,
+    .whatsapp-link img {
+      width: 28px;
+      height: 28px;
+    }
+    .site-title {
+      flex-grow: 1;
+      text-align: center;
       font-size: 1.2rem;
     }
-    .whatsapp-link {
-      position: absolute;
-      right: 1.5rem;
-      top: 50%;
-      transform: translateY(-50%);
-    }
-    .whatsapp-link img {
-      width: 32px;
-      height: 32px;
+    @media (min-width: 768px) {
+      .site-title {
+        font-size: 1.8rem;
+      }
+      .content {
+        max-width: 600px;
+        font-size: 1.2rem;
+      }
     }
     section {
       position: relative;
@@ -69,26 +82,80 @@
       border-radius: 12px;
       max-width: 90%;
     }
-    @media (min-width: 768px) {
-      header h1 {
-        font-size: 1.8rem;
-      }
-      .content {
-        max-width: 600px;
-        font-size: 1.2rem;
-      }
+    .web-dev-section {
+  background: 
+    linear-gradient(135deg, #f4f4f4, #ffffff), /* cor de fundo quase branca */
+    url('https://www.transparenttextures.com/patterns/graph-paper.png'); /* textura leve */
+  background-blend-mode: overlay;
+  color: black; /* cor de texto preta para contraste */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+  min-height: 100vh;
+  text-align: center;
+}
+
+  .web-dev-section .content {
+    max-width: 700px;
+    background: rgba(0, 0, 0, 0.4);
+    padding: 2rem;
+    border-radius: 16px;
+    backdrop-filter: blur(5px);
+  }
+
+  .web-dev-section h2 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+  }
+
+  .web-dev-section p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+  }
+    footer {
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      text-align: center;
+      padding: 1.5rem 1rem;
+      font-size: 0.9rem;
+    }
+    .social-links {
+      margin-bottom: 0.5rem;
+    }
+    .social-links a {
+      margin: 0 0.5rem;
+      display: inline-block;
+    }
+    .social-links img {
+      width: 28px;
+      height: 28px;
+      vertical-align: middle;
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>Murilo Drone Images</h1>
-    <a href="https://wa.me/5541991042120" target="_blank" class="whatsapp-link" aria-label="Fale conosco no WhatsApp">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" />
-    </a>
+    <div class="header-container">
+      <div class="social-header">
+        <a href="https://www.instagram.com/murilodroneimages/" target="_blank" aria-label="Instagram">
+          <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
+        </a>
+        <a href="https://www.facebook.com/profile.php?id=61575882148240" target="_blank" aria-label="Facebook">
+          <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+        </a>
+        <a href="https://www.youtube.com/@MuriloDroneImages" target="_blank" aria-label="YouTube">
+          <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube">
+        </a>
+      </div>
+      <h1 class="site-title">Murilo Drone Images</h1>
+      <a href="https://wa.me/5541991042120" target="_blank" class="whatsapp-link" aria-label="Fale conosco no WhatsApp">
+        <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" />
+      </a>
+    </div>
   </header>
- 
+
   <section>
     <video class="bg-video" autoplay muted loop>
       <source src="movies/por-do-sol-morro-l2002.mp4" type="video/mp4" />
@@ -126,7 +193,7 @@
       <p>o que for interessante para seu agronegócio. </p>
     </div>
   </section>
-  
+
   <section class="web-dev-section">
   <div class="overlay">
     <div class="content">
@@ -136,56 +203,10 @@
   </div>
 </section>
 
-<style>
-.web-dev-section {
-  position: relative;
-  background-color: #f0f0f0;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-}
-</style>
- <footer>
-  <div class="social-links">
-    <a href="https://www.instagram.com/murilodroneimages/" target="_blank" aria-label="Instagram">
-      <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
-    </a>
-    <a href="https://www.facebook.com/profile.php?id=61575882148240" target="_blank" aria-label="Facebook">
-      <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
-    </a>
-    <a href="https://www.youtube.com/@MuriloDroneImages" target="_blank" aria-label="YouTube">
-      <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube">
-    </a>
-  </div>
-  <p>&copy; 2025 Murilo Drone Images. Todos os direitos reservados.</p>
-</footer>
-
-<style>
-  footer {
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    text-align: center;
-    padding: 1.5rem 1rem;
-    font-size: 0.9rem;
-  }
-
-  .social-links {
-    margin-bottom: 0.5rem;
-  }
-
-  .social-links a {
-    margin: 0 0.5rem;
-    display: inline-block;
-  }
-
-  .social-links img {
-    width: 28px;
-    height: 28px;
-    vertical-align: middle;
-  }
-</style>
+  <footer>
+    <div class="social-links">
+    <p>&copy; 2025 Murilo Drone Images. Todos os direitos reservados.</p>
+  </footer>
 
 </body>
 </html>
