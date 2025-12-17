@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <title>Cadastrar Usuário</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 24px; max-width: 520px; margin: auto; }
+    label { display:block; margin-top:12px; }
+    input { width:100%; padding:8px; margin-top:4px; box-sizing: border-box; }
+    button { margin-top:16px; padding:10px 16px; }
+    pre { background:#f4f4f4; padding:12px; white-space:pre-wrap; }
+  </style>
+</head>
+<body>
+  <h2>Cadastrar Usuário</h2>
+
+  <form id="userForm">
+    <label>
+      Nome
+      <input type="text" id="name" required />
+    </label>
+
+    <label>
+      WhatsApp (único)
+      <input type="text" id="whatsapp" required placeholder="+5511999999999" />
+    </label>
+
+    <label>
+      Data de nascimento
+      <input type="date" id="date_of_birth" />
+    </label>
+
+    <button type="submit">Salvar</button>
+  </form>
+
+  <h3>Resposta</h3>
+  <pre id="response">Nenhuma ação ainda.</pre>
+
+  <script>
+    // --- CONFIGURAÇÃO (substitua <PROJECT_REF> e <ANON_KEY> se necessário) ---
+    // Endpoint da Edge Function implantada: save_user
+    // Use o PROJECT REF do seu projeto (encontrado no dashboard). Exemplo: aiqpxlxrynlfyylsrrrl
+    const PROJECT_REF = "aiqpxlxrynlfyylsrrrl"; // já configurado
+    const EDGE_FN_URL = "https://aiqpxlxrynlfyylsrrrl.supabase.co/functions/v1/save_user";
+
+    // Para testes em frontend, usamos a anon key. NÃO COLOQUE A SERVICE_ROLE_KEY NO FRONTEND.
+    // Substitua ANON_KEY se tiver uma anon key diferente. Se estiver testando localmente via supabase CLI,
+    // modifique para apontar para http://localhost:54321 (ou o host da sua função).
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpcXB4bHhyeW5sZnl5bHNycnJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4OTk0ODMsImV4cCI6MjA4MTQ3NTQ4M30.3kw0FTp2br0I07FuAdYlCwNxjwoJdWytzcmo3agv8qc";
+
+    // Helper para mostrar resposta
+    function showResponse(obj) {
+      const pre = document.getElementById('response');
+      pre.textContent = JSON.stringify(obj, null, 2);
+    }
+
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('name').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const date_of_birth = document.getElementById('date_of_birth').value || null;
+
+      if (!name || !whatsapp) {
+        showResponse({ error: 'Os campos name e whatsapp são obrigatórios.' });
+        return;
+      }
+
+      const payload = { name, whatsapp };
+      if (date_of_birth) payload.date_of_birth = date_of_birth;
+
+      try {
+        const res = await fetch(EDGE_FN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            // Envia a anon key no header Authorization: Bearer <anon_key>
+            'Authorization': 'Bearer ' + ANON_KEY
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json().catch(() => ({ status: res.status, text: 'Invalid JSON' }));
+
+        if (!res.ok) {
+          showResponse({ status: res.status, error: data });
+        } else {
+          showResponse({ status: res.status, data });
+        }
+      } catch (err) {
+        showResponse({ error: 'Network or unexpected error', details: err.toString() });
+      }
+    });
+
+    // Exemplo: preencha automaticamente ANON_KEY se você quiser (somente para dev/testing)
+    // document.addEventListener('DOMContentLoaded', () => {
+    //   // ANON_KEY = 'eyJhbGciOiJI...'; // definir se necessário
+    // });
+  </script>
+</body>
+</html>
