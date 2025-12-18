@@ -24,6 +24,10 @@
       <input type="text" id="email" required />
     </label>
     <label>
+      Set a Password
+      <input type="password" id="password" required />
+    </label>
+    <label>
       WhatsApp (único)
       <input type="text" id="whatsapp" required placeholder="+5511999999999" />
     </label>
@@ -61,15 +65,16 @@
       e.preventDefault();
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value.trim();
       const whatsapp = document.getElementById('whatsapp').value.trim();
       const date_of_birth = document.getElementById('date_of_birth').value || null;
 
-      if (!name || !email || !whatsapp) {
-        showResponse({ error: 'Os campos name, email e whatsapp são obrigatórios.' });
+      if (!name || !email || !whatsapp || !password) {
+        showResponse({ error: 'Os campos name, email, password e whatsapp são obrigatórios.' });
         return;
       }
       
-      const payload = { name, whatsapp, email };
+      const payload = { name, whatsapp, email, password };
       if (date_of_birth) payload.date_of_birth = date_of_birth;
 
       try {
