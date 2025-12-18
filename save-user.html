@@ -68,8 +68,8 @@
         showResponse({ error: 'Os campos name, email e whatsapp são obrigatórios.' });
         return;
       }
-
-      const payload = { name, whatsapp };
+      
+      const payload = { name, whatsapp, email };
       if (date_of_birth) payload.date_of_birth = date_of_birth;
 
       try {
