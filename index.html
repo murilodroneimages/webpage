@@ -54,35 +54,144 @@
         font-size: 1.2rem;
       }
     }
-    section {
-      position: relative;
-      height: 100vh;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: white;
-      text-align: center;
-      padding: 4rem 1rem 2rem;
-    }
-    video.bg-video {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      z-index: -1;
-    }
-    .content {
-      position: relative;
-      z-index: 2;
-      background: rgba(0, 0, 0, 0.5);
-      padding: 2rem;
-      border-radius: 12px;
-      max-width: 90%;
-    }
-    .web-dev-section {
+    /* Container Principal com efeito de vidro */
+.glass-card {
+  position: relative;
+  z-index: 2;
+  background: rgba(0, 0, 0, 0.65); /* Fundo escuro transparente */
+  backdrop-filter: blur(12px);      /* Desfoque do fundo */
+  padding: 3rem;                    /* Espaço interno */
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  max-width: 1000px;
+  width: 90%;
+  
+  /* FLEXBOX: A mágica do alinhamento */
+  display: flex;
+  align-items: center; /* Centraliza verticalmente */
+  justify-content: center;
+  gap: 4rem; /* Aumentei o espaço entre imagem e texto conforme pedido */
+}
+
+/* Estilo da Imagem (O print do código) */
+.feature-image {
+  width: 100%;
+  max-width: 450px; /* Limita o tamanho para não estourar */
+  height: auto;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5); /* Sombra para destacar o print */
+  transition: transform 0.3s ease;
+}
+
+/* Efeito ao passar o mouse na imagem (opcional) */
+.feature-image:hover {
+  transform: scale(1.02);
+}
+
+/* Tipografia */
+.text-content {
+  text-align: left;
+  color: white;
+  flex: 1; /* Ocupa o espaço restante */
+}
+
+.text-content h1 {
+  font-size: 2.8rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.text-content p {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #e0e0e0;
+}
+
+/* --- RESPONSIVIDADE (Mobile) --- */
+@media (max-width: 900px) {
+  .glass-card {
+    flex-direction: column; /* Empilha: Imagem em cima, texto embaixo */
+    gap: 2rem; /* Reduz o espaço no mobile */
+    padding: 2rem;
+    text-align: center; /* Centraliza texto no mobile */
+  }
+
+  .text-content {
+    text-align: center; /* Garante alinhamento central no mobile */
+  }
+
+  .feature-image {
+    max-width: 100%; /* Imagem ocupa a largura disponível no celular */
+  }
+  
+  .text-content h1 {
+    font-size: 2rem; /* Fonte menor no celular */
+  }
+}
+section {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: white; /* Garante que o texto seja branco por padrão */
+}
+
+/* Camada de Sobreposição (Overlay) */
+section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* Gradiente ou cor sólida para dar contraste ao texto */
+  background: rgba(24, 24, 24, 0.6); 
+  z-index: 1;
+}
+
+video.bg-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  /* Removi a opacity direta para o vídeo não ficar "lavado" */
+}
+
+.content {
+  position: relative;
+  z-index: 2; /* Fica acima do overlay (z-index 1) */
+  background: rgba(255, 255, 255, 0.1); /* Um leve vidro para sofisticação */
+  backdrop-filter: blur(10px); /* Efeito de desfoque atrás do card */
+  padding: 2.5rem;
+  border-radius: 16px;
+  max-width: 800px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.content h1 {
+  margin-top: 0;
+  font-size: 2.5rem;
+}
+
+.content ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 1.5rem;
+}
+
+.content li {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+.web-dev-section {
   background: 
     linear-gradient(135deg, #f4f4f4, #ffffff), /* cor de fundo quase branca */
     url('https://www.transparenttextures.com/patterns/graph-paper.png'); /* textura leve */
@@ -143,7 +252,7 @@
   <header>
     <div class="header-container">
       <div class="social-header">
-        <a href="https://www.instagram.com/murilodroneimages/" target="_blank" aria-label="Instagram">
+        <a href="https://www.instagram.com/muriloaoliveiraoficial/" target="_blank" aria-label="Instagram">
           <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
         </a>
         
@@ -164,7 +273,7 @@
         </a>
 
       </div>
-      <h1 class="site-title">Murilo Drone Images</h1>
+      <h1 class="site-title">Murilo Oliveira</h1>
       <a href="https://wa.me/5541991042120" target="_blank" class="whatsapp-link" aria-label="Fale conosco no WhatsApp">
         <img src="https://cdn-icons-png.flaticon.com/512/733/733585.png" alt="WhatsApp" />
       </a>
@@ -172,55 +281,62 @@
   </header>
 
   <section>
-    <video class="bg-video" autoplay muted loop>
+    <video class="bg-video" autoplay muted loop playsinline>
+      <source src="movies/lupulos.mp4" type="video/mp4" />
+      Seu navegador não suporta vídeos HTML5.
+    </video>
+    
+    <div class="content">
+      <h1>Soluções em sistemas, IA e mídias</h1>
+      <ul>
+        <li>🚀 Mais de 15 anos em desenvolvimento de software.</li>
+        <li>🤖 Responda clientes ou time 24/7-365 utilizando agentes de IA.</li>
+        <li>📸 Imagens e midias, meu hobby de aventura que gera valor.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
+    <video class="bg-video" autoplay muted loop playsinline>
       <source src="movies/por-do-sol-morro-l2002.mp4" type="video/mp4" />
       Seu navegador não suporta vídeos HTML5.
     </video>
-    <div class="content">
-      <h1>Guarde suas realizações</h1>
-      <br/>
-      <p>Uma imagem pode valer mais que MIL palavras.</p>
+
+    <div class="glass-card">
+      <div class="image-wrapper">
+        <img src="movies/codigo-html5.png" alt="Código Node.js" class="feature-image" />
+      </div>
+
+      <div class="text-content">
+        <h1>Webpage + IA + Sistema</h1>
+        <span>
+          <p>🚀 Imagina um de web sites moderno, <br/>
+            simples e focado em apresentar o negócio.</p>
+          <br/>
+          <p>
+            🤖 Responder clientes ou time 24/7-365 utilizando
+            Agentes de IA Generativa.
+          </p>
+          <br/>
+          <p>
+            Com IA generativa podemos ter uma interação
+            mais natural ao contexto, chama funcionalidades de sistema<br/>
+            em vez de somente dar opção-1-2-3...
+          </p>
+          <br/>
+          <p>
+            É Importante adequar o sistema para compartilhar 
+            os dados relevantes com o agente inteligente.
+          </p>
+        </span>
+          
+      </div>
     </div>
   </section>
-
-  <section>
-    <video class="bg-video" autoplay muted loop>
-      <source src="movies/igreja-STI-drone-dji2.mp4" type="video/mp4" />
-      Seu navegador não suporta vídeos HTML5.
-    </video>
-    <div class="content">
-      <h1>SIM</h1>
-      <p>Agora podemos ver tudo de cima.</p>
-      <p>Uma outra pespectiva.</p>
-    </div>
-  </section>
-
-  <section>
-    <video class="bg-video" autoplay muted loop>
-      <source src="movies/sitio-meg-ticotico-rubi-bambu2.mp4" type="video/mp4" />
-      Seu navegador não suporta vídeos HTML5.
-    </video>
-    <div class="content">
-      <h1>Sua área rural</h1>
-      <p>Além de manter as imagens como histórico</p>
-      <p>você pode acompanhar e observar suas</p>
-      <p>plantações, desenvolvimento de áreas e </p>
-      <p>o que for interessante para seu agronegócio. </p>
-    </div>
-  </section>
-
-  <section class="web-dev-section">
-  <div class="overlay">
-    <div class="content">
-      <h2>Desenvolvimento de Websites</h2>
-      <p>Criação de sites modernos, responsivos e otimizados para todos os dispositivos. Transforme sua presença online com um design profissional e tecnologia de ponta.</p>
-    </div>
-  </div>
-</section>
 
   <footer>
     <div class="social-links">
-    <p>&copy; 2025 Murilo Drone Images. Todos os direitos reservados.</p>
+    <p>&copy; webpage desenvolvida por Murilo Augusto de Oliveira.</p>
   </footer>
 
 </body>
