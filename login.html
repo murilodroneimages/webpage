@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | Lojabot SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-center py-10 sm:px-6 lg:px-8">
+
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="flex justify-center text-blue-600 mb-2">
+      <i class="ph-fill ph-robot text-5xl"></i>
+    </div>
+    <h2 class="mt-2 text-center text-3xl font-extrabold text-gray-900">
+      Acesse sua conta
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Ou <a href="/cadastro.html" class="font-medium text-blue-600 hover:text-blue-500">crie sua loja gratuitamente</a>
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
+      
+      <div id="alertBox" class="hidden mb-5 p-4 rounded-md text-sm flex items-center gap-2" role="alert">
+        <i id="alertIcon" class="ph text-lg"></i>
+        <span id="alertMessage"></span>
+      </div>
+
+      <form id="loginForm" class="space-y-6">
+        
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">E-mail corporativo</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="ph ph-envelope-simple text-gray-400"></i>
+            </div>
+            <input id="email" name="email" type="email" required 
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="contato@loja.com.br">
+          </div>
+        </div>
+
+        <div>
+          <label for="whatsapp" class="block text-sm font-medium text-gray-700">WhatsApp da Loja</label>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="ph ph-whatsapp-logo text-gray-400"></i>
+            </div>
+            <input id="whatsapp" name="whatsapp" type="tel" required 
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="5541999999999">
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between">
+            <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+            <div class="text-sm">
+              <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Esqueceu a senha?</a>
+            </div>
+          </div>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <i class="ph ph-lock-key text-gray-400"></i>
+            </div>
+            <input id="password" name="password" type="password" required 
+              class="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="••••••••">
+          </div>
+        </div>
+
+        <div>
+          <button id="submitBtn" type="submit" 
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Entrar no Painel
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    // --- CONFIGURAÇÃO SUPABASE ---
+    const EDGE_FN_URL = "https://aiqpxlxrynlfyylsrrrl.supabase.co/functions/v1/auth-tenant";
+    
+    // A chave anônima pública para chamadas de frontend
+    const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpcXB4bHhyeW5sZnl5bHNycnJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4OTk0ODMsImV4cCI6MjA4MTQ3NTQ4M30.3kw0FTp2br0I07FuAdYlCwNxjwoJdWytzcmo3agv8qc";
+
+    // --- ELEMENTOS DO DOM ---
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    const alertIcon = document.getElementById('alertIcon');
+
+    // --- LÓGICA DE FEEDBACK VISUAL ---
+    function showAlert(message, type) {
+      alertBox.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+      
+      if (type === 'success') {
+        alertBox.classList.add('bg-green-50', 'text-green-800');
+        alertIcon.className = 'ph ph-check-circle text-lg';
+      } else {
+        alertBox.classList.add('bg-red-50', 'text-red-800');
+        alertIcon.className = 'ph ph-warning-circle text-lg';
+      }
+      alertMessage.textContent = message;
+    }
+
+    // --- SUBMISSÃO DO FORMULÁRIO ---
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      alertBox.classList.add('hidden');
+
+      const email = document.getElementById('email').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+      const password = document.getElementById('password').value;
+
+      const payload = { email, whatsapp, password };
+
+      // UX: Altera botão para Loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Autenticando...';
+
+      try {
+        const res = await fetch(EDGE_FN_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + ANON_KEY
+          },
+          body: JSON.stringify(payload)
+        });
+
+        // Tenta fazer o parse da resposta
+        const data = await res.json().catch(() => ({ error: 'Falha na comunicação com o servidor.' }));
+
+        if (!res.ok) {
+          // Exibe apenas a mensagem amigável que a nossa Edge Function retornou
+          showAlert(data.error || 'Não foi possível realizar o login.', 'error');
+        } else {
+          showAlert('Login realizado! Redirecionando...', 'success');
+          
+          // 🔥 SALVA OS DADOS NO NAVEGADOR PARA MANTER A SESSÃO ATIVA
+          localStorage.setItem('lojabot_session', JSON.stringify(data.session));
+          localStorage.setItem('lojabot_tenant', JSON.stringify(data.tenant));
+
+          // Redireciona para o Painel Dashboard após 1 segundo
+          setTimeout(() => {
+            window.location.href = '/dashboard.html'; 
+          }, 1000);
+        }
+      } catch (err) {
+        // Erros de rede (CORS, sem internet, etc)
+        showAlert('Erro de conexão. Verifique sua internet e tente novamente.', 'error');
+      } finally {
+        // Restaura o botão caso tenha dado erro (se deu sucesso, a página vai redirecionar)
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Entrar no Painel';
+      }
+    });
+  </script>
+</body>
+</html>
