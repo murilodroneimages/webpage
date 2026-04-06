@@ -2,87 +2,203 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <title>Cadastrar Usuário</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 24px; max-width: 520px; margin: auto; }
-    label { display:block; margin-top:12px; }
-    input { width:100%; padding:8px; margin-top:4px; box-sizing: border-box; }
-    button { margin-top:16px; padding:10px 16px; }
-    pre { background:#f4f4f4; padding:12px; white-space:pre-wrap; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastrar Usuário | Lojabot SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
 </head>
-<body>
-  <h2>Cadastrar Usuário</h2>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col justify-center py-10 sm:px-6 lg:px-8">
 
-  <form id="userForm">
-    <label>
-      Nome
-      <input type="text" id="name" required />
-    </label>
-    <label>
-      Email
-      <input type="text" id="email" required />
-    </label>
-    <label>
-      Set a Password
-      <input type="password" id="password" required />
-    </label>
-    <label>
-      WhatsApp (único)
-      <input type="text" id="whatsapp" required placeholder="+5511999999999" />
-    </label>
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Crie sua conta
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Comece a automatizar suas vendas no WhatsApp
+    </p>
+  </div>
 
-    <label>
-      Data de nascimento
-      <input type="date" id="date_of_birth" />
-    </label>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-100">
+      
+      <div id="alertBox" class="hidden mb-4 p-4 rounded-md text-sm" role="alert">
+        <span id="alertMessage"></span>
+      </div>
 
-    <button type="submit">Salvar</button>
-  </form>
+      <form id="userForm" class="space-y-5">
+        <div>
+          <label for="name" class="block text-sm font-medium text-gray-700">Nome da Loja / Responsável</label>
+          <div class="mt-1">
+            <input id="name" name="name" type="text" required 
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="Ex: Padaria do João">
+          </div>
+        </div>
 
-  <h3>Resposta</h3>
-  <pre id="response">Nenhuma ação ainda.</pre>
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700">E-mail</label>
+          <div class="mt-1">
+            <input id="email" name="email" type="email" required 
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="contato@loja.com.br">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="whatsapp" class="block text-sm font-medium text-gray-700">WhatsApp</label>
+            <div class="mt-1">
+              <input id="whatsapp" name="whatsapp" type="tel" required 
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+                placeholder="5541999999999">
+            </div>
+          </div>
+          <div>
+            <label for="date_of_birth" class="block text-sm font-medium text-gray-700">Data de Nascimento</label>
+            <div class="mt-1">
+              <input id="date_of_birth" name="date_of_birth" type="date" 
+                class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-gray-500 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700">Senha</label>
+          <div class="mt-1">
+            <input id="password" name="password" type="password" required 
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="••••••••">
+          </div>
+          
+          <ul class="mt-2 text-xs text-gray-500 space-y-1">
+            <li id="req-length" class="flex items-center gap-1 transition-colors"><i class="ph ph-x-circle text-red-500"></i> Mínimo de 8 caracteres</li>
+            <li id="req-upper" class="flex items-center gap-1 transition-colors"><i class="ph ph-x-circle text-red-500"></i> Pelo menos 1 letra maiúscula</li>
+            <li id="req-number" class="flex items-center gap-1 transition-colors"><i class="ph ph-x-circle text-red-500"></i> Pelo menos 1 número</li>
+          </ul>
+        </div>
+
+        <div>
+          <label for="confirm_password" class="block text-sm font-medium text-gray-700">Confirmar Senha</label>
+          <div class="mt-1">
+            <input id="confirm_password" name="confirm_password" type="password" required 
+              class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" 
+              placeholder="••••••••">
+          </div>
+          <p id="match-error" class="mt-1 text-xs text-red-600 hidden">As senhas não coincidem.</p>
+        </div>
+
+        <div>
+          <button id="submitBtn" type="submit" 
+            class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Criar Conta
+          </button>
+        </div>
+      </form>
+
+      <div class="mt-6 border-t border-gray-200 pt-4">
+        <h3 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">Logs do Sistema</h3>
+        <pre id="response" class="bg-gray-900 text-green-400 p-3 rounded-md text-xs overflow-x-auto whitespace-pre-wrap font-mono">Aguardando ação...</pre>
+      </div>
+
+    </div>
+  </div>
 
   <script>
-    // --- CONFIGURAÇÃO (substitua <PROJECT_REF> e <ANON_KEY> se necessário) ---
-    // Endpoint da Edge Function implantada: save_user
-    // Use o PROJECT REF do seu projeto (encontrado no dashboard). Exemplo: aiqpxlxrynlfyylsrrrl
-    const PROJECT_REF = "aiqpxlxrynlfyylsrrrl"; // já configurado
+    // --- CONFIGURAÇÃO SUPABASE ---
     const EDGE_FN_URL = "https://aiqpxlxrynlfyylsrrrl.supabase.co/functions/v1/save_user";
-
-    // Para testes em frontend, usamos a anon key. NÃO COLOQUE A SERVICE_ROLE_KEY NO FRONTEND.
-    // Substitua ANON_KEY se tiver uma anon key diferente. Se estiver testando localmente via supabase CLI,
-    // modifique para apontar para http://localhost:54321 (ou o host da sua função).
     const ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFpcXB4bHhyeW5sZnl5bHNycnJsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjU4OTk0ODMsImV4cCI6MjA4MTQ3NTQ4M30.3kw0FTp2br0I07FuAdYlCwNxjwoJdWytzcmo3agv8qc";
 
-    // Helper para mostrar resposta
-    function showResponse(obj) {
-      const pre = document.getElementById('response');
-      pre.textContent = JSON.stringify(obj, null, 2);
+    // --- ELEMENTOS DO DOM ---
+    const form = document.getElementById('userForm');
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const matchError = document.getElementById('match-error');
+    const submitBtn = document.getElementById('submitBtn');
+    const alertBox = document.getElementById('alertBox');
+    const alertMessage = document.getElementById('alertMessage');
+    const logViewer = document.getElementById('response');
+
+    // Elementos da Política de Senha
+    const reqLength = document.getElementById('req-length');
+    const reqUpper = document.getElementById('req-upper');
+    const reqNumber = document.getElementById('req-number');
+
+    // --- LÓGICA DE FEEDBACK VISUAL ---
+    function showAlert(message, type) {
+      alertBox.classList.remove('hidden', 'bg-green-50', 'text-green-800', 'bg-red-50', 'text-red-800');
+      if (type === 'success') {
+        alertBox.classList.add('bg-green-50', 'text-green-800');
+      } else {
+        alertBox.classList.add('bg-red-50', 'text-red-800');
+      }
+      alertMessage.textContent = message;
     }
 
-    document.getElementById('userForm').addEventListener('submit', async (e) => {
+    function updatePolicyUI(element, isValid) {
+      const icon = element.querySelector('i');
+      if (isValid) {
+        element.classList.remove('text-gray-500');
+        element.classList.add('text-green-600');
+        icon.className = 'ph ph-check-circle text-green-600';
+      } else {
+        element.classList.remove('text-green-600');
+        element.classList.add('text-gray-500');
+        icon.className = 'ph ph-x-circle text-red-500';
+      }
+    }
+
+    // --- VALIDAÇÃO EM TEMPO REAL ---
+    passwordInput.addEventListener('input', (e) => {
+      const val = e.target.value;
+      updatePolicyUI(reqLength, val.length >= 8);
+      updatePolicyUI(reqUpper, /[A-Z]/.test(val));
+      updatePolicyUI(reqNumber, /[0-9]/.test(val));
+    });
+
+    confirmInput.addEventListener('input', () => {
+      if (confirmInput.value !== passwordInput.value && confirmInput.value !== '') {
+        matchError.classList.remove('hidden');
+      } else {
+        matchError.classList.add('hidden');
+      }
+    });
+
+    // --- SUBMISSÃO DO FORMULÁRIO ---
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
+      alertBox.classList.add('hidden');
+
       const name = document.getElementById('name').value.trim();
       const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
+      const password = passwordInput.value;
+      const confirm = confirmInput.value;
       const whatsapp = document.getElementById('whatsapp').value.trim();
       const date_of_birth = document.getElementById('date_of_birth').value || null;
 
-      if (!name || !email || !whatsapp || !password) {
-        showResponse({ error: 'Os campos name, email, password e whatsapp são obrigatórios.' });
+      // Validação de Frontend (Fail Fast)
+      if (password !== confirm) {
+        showAlert('As senhas não coincidem. Verifique a digitação.', 'error');
         return;
       }
-      
+
+      if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+        showAlert('A senha não atende a todas as políticas de segurança.', 'error');
+        return;
+      }
+
       const payload = { name, whatsapp, email, password };
       if (date_of_birth) payload.date_of_birth = date_of_birth;
+
+      // UX: Altera botão para Loading
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="ph ph-spinner animate-spin mr-2"></i> Processando...';
+      logViewer.textContent = "Enviando requisição...";
 
       try {
         const res = await fetch(EDGE_FN_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            // Envia a anon key no header Authorization: Bearer <anon_key>
             'Authorization': 'Bearer ' + ANON_KEY
           },
           body: JSON.stringify(payload)
@@ -90,20 +206,25 @@
 
         const data = await res.json().catch(() => ({ status: res.status, text: 'Invalid JSON' }));
 
+        // Imprime no log para debug
+        logViewer.textContent = JSON.stringify({ status: res.status, data }, null, 2);
+
         if (!res.ok) {
-          showResponse({ status: res.status, error: data });
+          showAlert(`Erro no cadastro: ${data.error || 'Falha ao processar.'}`, 'error');
         } else {
-          showResponse({ status: res.status, data });
+          showAlert('Cadastro realizado com sucesso! Bem-vindo.', 'success');
+          form.reset(); // Limpa o formulário
+          // Aqui você poderia redirecionar o usuário: window.location.href = '/login.html';
         }
       } catch (err) {
-        showResponse({ error: 'Network or unexpected error', details: err.toString() });
+        logViewer.textContent = JSON.stringify({ error: 'Network Error', details: err.toString() }, null, 2);
+        showAlert('Erro de conexão com o servidor.', 'error');
+      } finally {
+        // Restaura botão
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Criar Conta';
       }
     });
-
-    // Exemplo: preencha automaticamente ANON_KEY se você quiser (somente para dev/testing)
-    // document.addEventListener('DOMContentLoaded', () => {
-    //   // ANON_KEY = 'eyJhbGciOiJI...'; // definir se necessário
-    // });
   </script>
 </body>
 </html>
