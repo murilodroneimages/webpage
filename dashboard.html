@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard | Lojabot SaaS</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <style>
+    /* Transições suaves para o menu lateral */
+    .sidebar-transition { transition: width 0.3s ease-in-out; }
+    .fade-in { animation: fadeIn 0.3s ease-in-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans antialiased flex h-screen overflow-hidden">
+
+  <aside id="sidebar" class="bg-gray-900 text-white w-64 flex-shrink-0 flex flex-col sidebar-transition z-20 relative">
+    <div class="h-16 flex items-center justify-between px-4 border-b border-gray-800">
+      <div class="flex items-center gap-2 overflow-hidden">
+        <i class="ph-fill ph-robot text-3xl text-blue-500 flex-shrink-0"></i>
+        <span id="logo-text" class="font-bold text-xl whitespace-nowrap">Lojabot</span>
+      </div>
+      <button id="toggleSidebar" class="text-gray-400 hover:text-white p-1 rounded-md bg-gray-800 hover:bg-gray-700 focus:outline-none">
+        <i id="toggle-icon" class="ph ph-caret-left"></i>
+      </button>
+    </div>
+
+    <nav class="flex-1 overflow-y-auto py-4 px-2 space-y-1">
+      <button onclick="changeView('view-home')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white group">
+        <i class="ph ph-house text-xl flex-shrink-0"></i>
+        <span class="sidebar-text whitespace-nowrap">Início</span>
+      </button>
+      
+      <button onclick="changeView('view-agent')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white group bg-gray-800 text-white">
+        <i class="ph ph-brain text-xl flex-shrink-0"></i>
+        <span class="sidebar-text whitespace-nowrap">Inteligência Artificial</span>
+      </button>
+
+      <button onclick="changeView('view-catalog')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 hover:text-white group">
+        <i class="ph ph-package text-xl flex-shrink-0"></i>
+        <span class="sidebar-text whitespace-nowrap">Catálogo</span>
+      </button>
+    </nav>
+
+    <div class="p-4 border-t border-gray-800">
+      <button onclick="logout()" class="w-full flex items-center gap-3 px-3 py-2 rounded-md text-red-400 hover:bg-gray-800 hover:text-red-300">
+        <i class="ph ph-sign-out text-xl flex-shrink-0"></i>
+        <span class="sidebar-text whitespace-nowrap">Sair</span>
+      </button>
+    </div>
+  </aside>
+
+  <div class="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
+    
+    <header class="h-16 bg-white shadow-sm flex items-center justify-between px-6 z-10">
+      <div class="flex items-center gap-4">
+        <h1 id="page-title" class="text-xl font-semibold text-gray-800">Inteligência Artificial</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
+          <i class="ph ph-storefront"></i>
+        </div>
+        <span id="tenant-name" class="text-sm font-medium text-gray-700 hidden sm:block">Minha Loja</span>
+      </div>
+    </header>
+
+    <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-6">
+      
+      <div id="view-home" class="view-section hidden fade-in">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Bem-vindo ao Lojabot</h2>
+        <p class="text-gray-600">Suas métricas aparecerão aqui em breve.</p>
+      </div>
+
+      <div id="view-agent" class="view-section fade-in">
+        <div class="max-w-3xl bg-white shadow rounded-lg border border-gray-100">
+          
+          <div class="px-6 py-5 border-b border-gray-200 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Personalidade do Atendente</h3>
+              <p class="mt-1 text-sm text-gray-500">Defina como a inteligência artificial deve conversar com seus clientes.</p>
+            </div>
+            <div class="flex items-center">
+              <span class="mr-3 text-sm font-medium text-gray-900" id="status-text">Bot Ativado</span>
+              <button type="button" id="toggle-bot" class="bg-blue-600 relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" aria-pressed="true">
+                <span id="toggle-knob" class="translate-x-5 pointer-events-none inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200"></span>
+              </button>
+            </div>
+          </div>
+
+          <div id="agentAlertBox" class="hidden p-4 text-sm mx-6 mt-4 rounded-md flex items-center gap-2">
+            <i id="agentAlertIcon" class="ph text-lg"></i>
+            <span id="agentAlertMessage"></span>
+          </div>
+
+          <form id="agentForm" class="px-6 py-5 space-y-6">
+            <div>
+              <label for="nome_agente" class="block text-sm font-medium text-gray-700">Nome do Atendente Virtual</label>
+              <input type="text" id="nome_agente" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Ex: Júlia da Padaria">
+            </div>
+
+            <div>
+              <label for="instrucao_agente" class="block text-sm font-medium text-gray-700">Instruções de Comportamento (Prompt)</label>
+              <p class="mt-1 text-xs text-gray-500 mb-2">Descreva o tom de voz, regras de entrega e o que o bot deve ou não fazer.</p>
+              <textarea id="instrucao_agente" rows="8" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm" placeholder="Aja como uma atendente simpática chamada Júlia. Nós não fazemos entregas aos domingos. Responda de forma curta..."></textarea>
+            </div>
+
+            <div class="flex justify-end pt-4 border-t border-gray-100">
+              <button type="submit" id="saveAgentBtn" class="flex items-center gap-2 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors">
+                <i class="ph ph-floppy-disk text-lg"></i> Salvar Configurações
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div id="view-catalog" class="view-section hidden fade-in">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Seu Catálogo</h2>
+        <p class="text-gray-600">Módulo de produtos em desenvolvimento...</p>
+      </div>
+
+    </main>
+  </div>
+
+  <script>
+    // 1. SEGURANÇA: Verificação de Login Inicial
+    const sessionStr = localStorage.getItem('lojabot_session');
+    const tenantStr = localStorage.getItem('lojabot_tenant');
+    
+    if (!sessionStr || !tenantStr) {
+      window.location.href = '/login.html'; // Chuta usuário não autenticado
+    }
+
+    const session = JSON.parse(sessionStr);
+    const tenant = JSON.parse(tenantStr);
+    
+    // Atualiza nome da loja no topo
+    document.getElementById('tenant-name').textContent = tenant.name;
+
+    // Configurações de API
+    const EDGE_FN_AGENT_URL = "https://aiqpxlxrynlfyylsrrrl.supabase.co/functions/v1/manage-agent-instruction";
+    const JWT_TOKEN = session.access_token; // O passaporte de acesso do usuário!
+
+    // ==========================================
+    // CONTROLES DE INTERFACE (UI)
+    // ==========================================
+    
+    // Roteamento SPA Simples (Esconde todas as telas, mostra a clicada)
+    function changeView(viewId) {
+      document.querySelectorAll('.view-section').forEach(el => el.classList.add('hidden'));
+      document.getElementById(viewId).classList.remove('hidden');
+      
+      // Atualiza botões do menu
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        btn.classList.remove('bg-gray-800', 'text-white');
+        btn.classList.add('text-gray-300');
+      });
+      event.currentTarget.classList.add('bg-gray-800', 'text-white');
+      event.currentTarget.classList.remove('text-gray-300');
+
+      // Atualiza Título da Página
+      document.getElementById('page-title').textContent = event.currentTarget.querySelector('span').textContent;
+    }
+
+    // Toggle Sidebar
+    let sidebarOpen = true;
+    document.getElementById('toggleSidebar').addEventListener('click', () => {
+      const sidebar = document.getElementById('sidebar');
+      const texts = document.querySelectorAll('.sidebar-text');
+      const logoText = document.getElementById('logo-text');
+      const icon = document.getElementById('toggle-icon');
+
+      sidebarOpen = !sidebarOpen;
+      
+      if (sidebarOpen) {
+        sidebar.classList.remove('w-20');
+        sidebar.classList.add('w-64');
+        setTimeout(() => { texts.forEach(t => t.classList.remove('hidden')); logoText.classList.remove('hidden'); }, 150);
+        icon.className = 'ph ph-caret-left';
+      } else {
+        sidebar.classList.remove('w-64');
+        sidebar.classList.add('w-20');
+        texts.forEach(t => t.classList.add('hidden'));
+        logoText.classList.add('hidden');
+        icon.className = 'ph ph-list';
+      }
+    });
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('lojabot_session');
+      localStorage.removeItem('lojabot_tenant');
+      window.location.href = '/login.html';
+    }
+
+    // ==========================================
+    // LÓGICA DE NEGÓCIO: INSTRUÇÕES DO AGENTE
+    // ==========================================
+    let isBotEnabled = true;
+
+    // Toggle Botão (UI)
+    const toggleBtn = document.getElementById('toggle-bot');
+    const toggleKnob = document.getElementById('toggle-knob');
+    const statusText = document.getElementById('status-text');
+
+    toggleBtn.addEventListener('click', () => {
+      isBotEnabled = !isBotEnabled;
+      if (isBotEnabled) {
+        toggleBtn.classList.replace('bg-gray-200', 'bg-blue-600');
+        toggleKnob.classList.add('translate-x-5');
+        toggleKnob.classList.remove('translate-x-0');
+        statusText.textContent = "Bot Ativado";
+      } else {
+        toggleBtn.classList.replace('bg-blue-600', 'bg-gray-200');
+        toggleKnob.classList.remove('translate-x-5');
+        toggleKnob.classList.add('translate-x-0');
+        statusText.textContent = "Bot Pausado";
+      }
+    });
+
+    function showAgentAlert(msg, type) {
+      const box = document.getElementById('agentAlertBox');
+      box.className = `p-4 text-sm mx-6 mt-4 rounded-md flex items-center gap-2 ${type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'}`;
+      document.getElementById('agentAlertIcon').className = type === 'success' ? 'ph ph-check-circle text-lg' : 'ph ph-warning-circle text-lg';
+      document.getElementById('agentAlertMessage').textContent = msg;
+    }
+
+    // 1. CARREGAR DADOS DO BANCO AO ABRIR A PÁGINA
+    async function loadAgentInstruction() {
+      try {
+        const res = await fetch(EDGE_FN_AGENT_URL, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${JWT_TOKEN}` } // Passaporte seguro!
+        });
+        const data = await res.json();
+        
+        if (res.ok && data.result) {
+          document.getElementById('nome_agente').value = data.result.nome_agente || '';
+          document.getElementById('instrucao_agente').value = data.result.instrucao_agente || '';
+          
+          if (data.result.habilitado === false && isBotEnabled) {
+            toggleBtn.click(); // Sincroniza o botão visual com o banco
+          }
+        }
+      } catch (e) {
+        console.error("Erro ao carregar instrução", e);
+      }
+    }
+
+    // 2. SALVAR DADOS NO BANCO
+    document.getElementById('agentForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('saveAgentBtn');
+      btn.innerHTML = '<i class="ph ph-spinner animate-spin"></i> Salvando...';
+      btn.disabled = true;
+
+      const payload = {
+        nome_agente: document.getElementById('nome_agente').value,
+        instrucao_agente: document.getElementById('instrucao_agente').value,
+        habilitado: isBotEnabled
+      };
+
+      try {
+        const res = await fetch(EDGE_FN_AGENT_URL, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JWT_TOKEN}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await res.json();
+        
+        if (res.ok) {
+          showAgentAlert('Instruções salvas e aplicadas à sua loja com sucesso!', 'success');
+        } else {
+          showAgentAlert(data.error || 'Erro ao salvar configurações.', 'error');
+        }
+      } catch (e) {
+        showAgentAlert('Erro de conexão.', 'error');
+      } finally {
+        btn.innerHTML = '<i class="ph ph-floppy-disk text-lg"></i> Salvar Configurações';
+        btn.disabled = false;
+        setTimeout(() => document.getElementById('agentAlertBox').classList.add('hidden'), 5000);
+      }
+    });
+
+    // Gatilho inicial
+    loadAgentInstruction();
+  </script>
+</body>
+</html>
