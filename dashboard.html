@@ -128,7 +128,7 @@
     const tenantStr = localStorage.getItem('lojabot_tenant');
     
     if (!sessionStr || !tenantStr) {
-      window.location.href = '/login.html'; // Chuta usuário não autenticado
+      window.location.href = '/webpage/login.html'; // Chuta usuário não autenticado
     }
 
     const session = JSON.parse(sessionStr);
