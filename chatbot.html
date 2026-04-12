@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lojabot | Sua IA de Vendas no WhatsApp</title>
+    <title>LojabotIA | Sua IA de ANTENDIMENTO no WhatsApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -53,9 +53,9 @@
 
     <nav class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
         <div class="text-2xl font-extrabold text-blue-600 flex items-center gap-2">
-            <i class="ph-fill ph-robot text-3xl"></i> Lojabot
+            <i class="ph-fill ph-robot text-3xl"></i> Lojabot IA
         </div>
-        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-all">
+        <a href="/webpage/login.html" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-all">
             Entrar
         </a>
     </nav>
@@ -67,14 +67,14 @@
                 O seu melhor vendedor <span class="text-blue-600 underline decoration-blue-200">não dorme.</span> Ele usa IA.
             </h1>
             <p class="text-lg lg:text-xl text-slate-600 max-w-lg mx-auto lg:mx-0">
-                O Lojabot atende seus clientes no WhatsApp com naturalidade humana, tira dúvidas e fecha pedidos 24h por dia.
+                <span class="text-blue-600 underline decoration-blue-200">Foque no seu negócio.</span>
+            </p>
+            <p class="text-lg lg:text-xl text-slate-600 max-w-lg mx-auto lg:mx-0">
+                O LojabotIA atende seus clientes no WhatsApp com naturalidade humana, tira dúvidas e direciona pedidos 24h por dia e 7 dia por semana.
             </p>
             <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button class="bg-emerald-500 hover:bg-emerald-600 text-white text-lg px-8 py-4 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
-                    <i class="ph ph-whatsapp-logo text-2xl"></i> Criar Loja Grátis
-                </button>
-                <button class="border-2 border-slate-200 hover:bg-slate-100 px-8 py-4 rounded-xl font-bold transition-all">
-                    Ver Demonstração
+                    <i class="ph ph-whatsapp-logo text-2xl"></i> Criar Atendente de IA
                 </button>
             </div>
         </div>
@@ -87,7 +87,7 @@
                         B
                     </div>
                     <div>
-                        <p class="font-bold text-sm">Padaria Delícia (Lojabot)</p>
+                        <p class="font-bold text-sm">MyStore Bot IA (LojabotIA)</p>
                         <p class="text-[10px] opacity-80" id="bot-status">online</p>
                     </div>
                 </div>
@@ -155,11 +155,11 @@
         const botStatus = document.getElementById('bot-status');
 
         const script = [
-            { sender: 'user', text: 'Olá! Vocês têm bolo de cenoura para hoje à tarde?' },
-            { sender: 'bot', text: 'Oi! Temos sim! 🥕 Acabou de sair uma fornada quentinha com cobertura de chocolate.' },
-            { sender: 'bot', text: 'Posso reservar um para você agora mesmo?' },
-            { sender: 'user', text: 'Sim, por favor! Qual o valor?' },
-            { sender: 'bot', text: 'O bolo médio está R$ 35,00. Gostaria de retirar na loja ou prefere entrega?' }
+            { sender: 'user', text: 'Olá! Vocês tem promoções hj?' },
+            { sender: 'bot', text: 'Oi! Temos sim! A loja está com até 70% de DESCONTO.' },
+            { sender: 'bot', text: 'Posso reservar algum produto para você?' },
+            { sender: 'user', text: 'Sim, A camisa basica por favor! Qual o valor?' },
+            { sender: 'bot', text: 'A camisa está R$ 35,00 já com desconto. Qual o tamanho?' }
         ];
 
         function createBubble(text, sender) {
