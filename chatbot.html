@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lojabot | Sua IA de Vendas no WhatsApp</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; scroll-behavior: smooth; }
+        
+        /* Animação dos 3 pontinhos do "digitando" */
+        .typing-dot {
+            animation: typing 1.4s infinite;
+            display: inline-block;
+            width: 6px;
+            height: 6px;
+            background: #9ca3af;
+            border-radius: 50%;
+            margin-right: 2px;
+        }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-4px); }
+        }
+
+        /* Mockup do Celular */
+        .phone-mockup {
+            border: 12px solid #1f2937;
+            border-radius: 3rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Fade In Up Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease-out;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 overflow-x-hidden">
+
+    <nav class="flex justify-between items-center px-6 py-4 max-w-7xl mx-auto">
+        <div class="text-2xl font-extrabold text-blue-600 flex items-center gap-2">
+            <i class="ph-fill ph-robot text-3xl"></i> Lojabot
+        </div>
+        <a href="#" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-all">
+            Entrar
+        </a>
+    </nav>
+
+    <header class="relative px-6 py-12 lg:py-24 max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
+        
+        <div class="space-y-8 order-2 lg:order-1 text-center lg:text-left">
+            <h1 class="text-4xl lg:text-6xl font-extrabold leading-tight tracking-tight">
+                O seu melhor vendedor <span class="text-blue-600 underline decoration-blue-200">não dorme.</span> Ele usa IA.
+            </h1>
+            <p class="text-lg lg:text-xl text-slate-600 max-w-lg mx-auto lg:mx-0">
+                O Lojabot atende seus clientes no WhatsApp com naturalidade humana, tira dúvidas e fecha pedidos 24h por dia.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <button class="bg-emerald-500 hover:bg-emerald-600 text-white text-lg px-8 py-4 rounded-xl font-bold shadow-lg shadow-emerald-200 transition-all transform hover:scale-105 flex items-center justify-center gap-2">
+                    <i class="ph ph-whatsapp-logo text-2xl"></i> Criar Loja Grátis
+                </button>
+                <button class="border-2 border-slate-200 hover:bg-slate-100 px-8 py-4 rounded-xl font-bold transition-all">
+                    Ver Demonstração
+                </button>
+            </div>
+        </div>
+
+        <div class="order-1 lg:order-2 flex justify-center">
+            <div class="phone-mockup w-[320px] h-[600px] bg-slate-900 relative overflow-hidden">
+                <div class="bg-[#075e54] text-white p-4 pt-8 flex items-center gap-3">
+                    <i class="ph ph-arrow-left"></i>
+                    <div class="w-10 h-10 bg-slate-300 rounded-full flex items-center justify-center text-slate-600 font-bold">
+                        B
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Padaria Delícia (Lojabot)</p>
+                        <p class="text-[10px] opacity-80" id="bot-status">online</p>
+                    </div>
+                </div>
+
+                <div id="chat-container" class="bg-[#e5ddd5] h-[calc(100%-110px)] p-4 overflow-y-auto flex flex-col gap-3">
+                    </div>
+
+                <div class="absolute bottom-0 w-full bg-white p-3 flex items-center gap-2">
+                    <div class="bg-slate-100 flex-1 rounded-full px-4 py-2 text-xs text-slate-400">Mensagem...</div>
+                    <div class="bg-[#128c7e] w-8 h-8 rounded-full flex items-center justify-center text-white">
+                        <i class="ph-fill ph-paper-plane-right"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="bg-white py-20 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 reveal">
+                <h2 class="text-3xl lg:text-4xl font-bold mb-4">Por que escolher o Lojabot?</h2>
+                <p class="text-slate-500">Tecnologia de ponta para empresas que buscam escala.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="reveal p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow">
+                    <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mb-6">
+                        <i class="ph-bold ph-clock-afternoon text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Atendimento 24/7</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        A IA não tira folga, não dorme e responde em segundos. Seus clientes nunca mais ficarão no "vácuo".
+                    </p>
+                </div>
+
+                <div class="reveal p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow" style="transition-delay: 150ms;">
+                    <div class="w-14 h-14 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center mb-6">
+                        <i class="ph-bold ph-chats-teardrop text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Conversa Humanizada</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        Esqueça robôs de botões engessados. Nossa IA entende o contexto e negocia como se fosse um humano.
+                    </p>
+                </div>
+
+                <div class="reveal p-8 rounded-2xl bg-slate-50 border border-slate-100 hover:shadow-xl transition-shadow" style="transition-delay: 300ms;">
+                    <div class="w-14 h-14 bg-purple-100 text-purple-600 rounded-xl flex items-center justify-center mb-6">
+                        <i class="ph-bold ph-gear-six text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Personalidade Própria</h3>
+                    <p class="text-slate-600 leading-relaxed">
+                        A IA aprende seu catálogo, suas regras de negócio e adota o tom de voz ideal para sua marca.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 border-t border-slate-200 text-center text-slate-400 text-sm">
+        &copy; 2026 Lojabot AI - Todos os direitos reservados.
+    </footer>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const botStatus = document.getElementById('bot-status');
+
+        const script = [
+            { sender: 'user', text: 'Olá! Vocês têm bolo de cenoura para hoje à tarde?' },
+            { sender: 'bot', text: 'Oi! Temos sim! 🥕 Acabou de sair uma fornada quentinha com cobertura de chocolate.' },
+            { sender: 'bot', text: 'Posso reservar um para você agora mesmo?' },
+            { sender: 'user', text: 'Sim, por favor! Qual o valor?' },
+            { sender: 'bot', text: 'O bolo médio está R$ 35,00. Gostaria de retirar na loja ou prefere entrega?' }
+        ];
+
+        function createBubble(text, sender) {
+            const div = document.createElement('div');
+            div.className = `max-w-[80%] p-3 rounded-lg text-sm shadow-sm transition-all duration-500 opacity-0 transform translate-y-4 ${
+                sender === 'user' 
+                ? 'bg-white self-end rounded-tr-none' 
+                : 'bg-[#dcf8c6] self-start rounded-tl-none'
+            }`;
+            div.innerText = text;
+            return div;
+        }
+
+        function showTypingIndicator() {
+            const div = document.createElement('div');
+            div.id = 'typing-indicator';
+            div.className = 'bg-[#dcf8c6] self-start p-3 rounded-lg rounded-tl-none flex gap-1 items-center';
+            div.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+            chatContainer.appendChild(div);
+            botStatus.innerText = 'digitando...';
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        async function startChatSimulation() {
+            chatContainer.innerHTML = '';
+            
+            for (let i = 0; i < script.length; i++) {
+                const item = script[i];
+                await new Promise(res => setTimeout(res, 1000));
+
+                if (item.sender === 'bot') {
+                    showTypingIndicator();
+                    await new Promise(res => setTimeout(res, 2000));
+                    document.getElementById('typing-indicator')?.remove();
+                    botStatus.innerText = 'online';
+                }
+
+                const bubble = createBubble(item.text, item.sender);
+                chatContainer.appendChild(bubble);
+                
+                // Força o reflow para animação
+                setTimeout(() => {
+                    bubble.classList.remove('opacity-0', 'translate-y-4');
+                }, 50);
+
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                await new Promise(res => setTimeout(res, 1500));
+            }
+
+            // Loop após 5 segundos
+            setTimeout(startChatSimulation, 5000);
+        }
+
+        // Observer para Animações de Scroll
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+        // Iniciar
+        window.onload = startChatSimulation;
+    </script>
+</body>
+</html>
