@@ -1,14 +1,46 @@
 const ConnectionController = {
   socket: null,
+  tenantId: null,
 
   init: function() {
-    const tenant = JSON.parse(localStorage.getItem('lojabot_tenant'));
+    // 1. Blindagem contra LocalStorage vazio (Usuário deslogado)
+    const tenantStr = localStorage.getItem('lojabot_tenant');
+    if (!tenantStr) {
+      console.error("❌ Tentativa de acesso sem tenant. Redirecionando...");
+      window.location.href = '/webpage/login.html';
+      return;
+    }
     
-    // Conecta ao backend Node.js (Ajuste localhost para o IP da sua Oracle Cloud em Produção)
-    this.socket = io('http://localhost:3001');
+    this.tenantId = JSON.parse(tenantStr).id;
 
+    // 2. Prevenção de Múltiplas Conexões (Padrão Singleton)
+    if (this.socket && this.socket.connected) {
+      console.log('⚡ Socket já conectado. Requisitando status atualizado...');
+      // Apenas pede para o servidor mandar o status de novo, sem criar nova conexão
+      this.socket.emit('join_tenant_room', this.tenantId);
+      return;
+    }
+
+    // 3. Setup da URL Dinâmica (Facilita quando for para a Oracle Cloud)
+    // Se o frontend estiver rodando no seu PC, usa localhost. Se estiver no Github Pages, usa o IP da sua VPS.
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const serverUrl = isLocalhost ? 'http://localhost:3001' : 'http://SEU_IP_DA_ORACLE_AQUI:3001'; 
+    
+    this.socket = io(serverUrl);
+    this.bindEvents();
+  },
+
+  bindEvents: function() {
     this.socket.on('connect', () => {
-      this.socket.emit('join_tenant_room', tenant.id);
+      console.log('🔌 Conectado ao servidor Node.js');
+      this.socket.emit('join_tenant_room', this.tenantId);
+    });
+
+    // 4. Tratamento de Queda de Servidor (Feedback visual vital para o cliente)
+    this.socket.on('connect_error', (err) => {
+      console.error('Falha na conexão WebSocket:', err.message);
+      document.getElementById('connection-title').textContent = "Servidor Indisponível";
+      document.getElementById('connection-subtitle').textContent = "Tentando reconectar automaticamente...";
     });
 
     this.socket.on('whatsapp_status', (data) => {
@@ -38,6 +70,7 @@ const ConnectionController = {
     document.getElementById('qr-image').classList.add('hidden');
     document.getElementById('qr-loader').classList.remove('hidden');
     document.getElementById('connection-title').textContent = "Gerando código...";
+    document.getElementById('connection-subtitle').textContent = "Comunicando com o servidor, aguarde.";
   },
 
   showConnectedCard: function(number, timeStr) {
