@@ -6,6 +6,7 @@
   <title>Painel | Lojabot SaaS</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <style>
     .sidebar-transition { transition: width 0.3s ease-in-out; }
     .fade-in { animation: fadeIn 0.3s ease-in-out; }
@@ -29,6 +30,11 @@
       <button id="menu-home" onclick="navigateTo('home')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 transition-colors">
         <i class="ph ph-house text-xl flex-shrink-0"></i>
         <span class="sidebar-text whitespace-nowrap">Início</span>
+      </button>
+
+      <button id="menu-connection" onclick="navigateTo('connection')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 transition-colors">
+        <i class="ph ph-plugs-connected text-xl flex-shrink-0"></i>
+        <span class="sidebar-text whitespace-nowrap">Conexão</span>
       </button>
       
       <button id="menu-agent" onclick="navigateTo('agent')" class="nav-btn w-full flex items-center gap-3 px-3 py-2 rounded-md hover:bg-gray-800 text-gray-300 transition-colors">
