@@ -3,6 +3,7 @@ const routes = {
   'home': '/webpage/views/home.html',
   'agent': '/webpage/views/agent.html',
   'catalog': '/webpage/views/catalog.html'
+  'connection': '/webpage/views/connection.html'
 };
 
 async function navigateTo(viewName) {
@@ -30,6 +31,10 @@ async function navigateTo(viewName) {
     if (viewName === 'agent') {
       // Chama o arquivo agentController.js
       if (typeof AgentController !== 'undefined') AgentController.init();
+    }
+    if (viewName === 'connection') {
+      // 🔥 Aciona o WebSocket quando o lojista clica no menu Conexão
+      if (typeof ConnectionController !== 'undefined') ConnectionController.init();
     }
     // if (viewName === 'catalog') CatalogController.init();
 
