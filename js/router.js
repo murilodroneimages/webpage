@@ -2,7 +2,7 @@
 const routes = {
   'home': '/webpage/views/home.html',
   'agent': '/webpage/views/agent.html',
-  'catalog': '/webpage/views/catalog.html'
+  'catalog': '/webpage/views/catalog.html',
   'connection': '/webpage/views/connection.html'
 };
 
