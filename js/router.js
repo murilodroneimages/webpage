@@ -36,6 +36,10 @@ async function navigateTo(viewName) {
       // 🔥 Aciona o WebSocket quando o lojista clica no menu Conexão
       if (typeof ConnectionController !== 'undefined') ConnectionController.init();
     }
+    if (viewName === 'catalog') {
+      // 🔥 Aciona o WebSocket quando o lojista clica no menu Conexão
+      if (typeof CatalogController !== 'undefined') CatalogController.init();
+    }
     // if (viewName === 'catalog') CatalogController.init();
 
   } catch (error) {
