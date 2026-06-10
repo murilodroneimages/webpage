@@ -24,7 +24,7 @@ const ConnectionController = {
     // 3. Setup da URL Dinâmica (Facilita quando for para a Oracle Cloud)
     // Se o frontend estiver rodando no seu PC, usa localhost. Se estiver no Github Pages, usa o IP da sua VPS.
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const serverUrl = isLocalhost ? 'http://localhost:3001' : 'http://SEU_IP_DA_ORACLE_AQUI:3001'; 
+    const serverUrl = isLocalhost ? 'http://localhost:3001' : 'https://chatbotapi.mooo.com'; 
     
     this.socket = io(serverUrl);
     this.bindEvents();
