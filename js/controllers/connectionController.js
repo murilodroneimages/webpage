@@ -3,71 +3,61 @@ const ConnectionController = {
   tenantId: null,
 
   init: function() {
-    // 1. Blindagem contra LocalStorage vazio ou corrompido
     const tenantStr = localStorage.getItem('lojabot_tenant');
     if (!tenantStr) {
-      console.error("❌ Tentativa de acesso sem tenant. Redirecionando...");
+      console.error("❌ Tentativa de acesso sem tenant.");
       window.location.href = '/webpage/login.html';
       return;
     }
 
-    // Previne crash fatal caso a string salva no navegador não seja um JSON válido
     try {
       this.tenantId = JSON.parse(tenantStr).id;
     } catch (e) {
-      console.error("❌ Dados de sessão corrompidos. Limpando e redirecionando...");
       localStorage.removeItem('lojabot_tenant');
       window.location.href = '/webpage/login.html';
       return;
     }
 
-    // 2. Setup da URL Dinâmica
+    // AVISO IMPORTANTE: Se o seu front for para produção (ex: mooo.com), 
+    // ele usará o protocolo seguro. Logo, seu servidor DEVE usar https://.
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    // Dica: Quando configurar SSL no Nginx, altere para https:// no servidor de produção
-    const serverUrl = isLocalhost ? 'http://localhost:3001' : 'http://chatbotapi.mooo.com';
+    const serverUrl = isLocalhost ? 'http://localhost:3001' : 'https://chatbotapi.mooo.com';
 
-    // 3. Prevenção de Múltiplas Conexões (Padrão Singleton)
+    // Gerenciamento Singleton com Reconexão
     if (this.socket) {
       if (this.socket.connected) {
-        console.log('⚡ Socket já conectado. Requisitando status atualizado...');
+        console.log('⚡ Socket conectado. Requisitando status...');
         this.socket.emit('join_tenant_room', this.tenantId);
-        return;
       } else {
-        // Se o objeto existe mas a conexão caiu, forçamos a reconexão nativa
+        console.log('⚡ Reconectando socket...');
         this.socket.connect();
-        return;
       }
+      return; // Se o socket já existe, NÃO rodamos o bindEvents() novamente!
     }
 
-    // 4. Primeira Instanciação com resiliência de rede
     this.socket = io(serverUrl, {
-      transports: ['websocket', 'polling'], // Força estabilidade passando pelo Proxy
-      reconnection: true,                   // Tenta reconectar automaticamente
-      reconnectionAttempts: Infinity,       // Não desiste de reconectar
-      reconnectionDelay: 2000               // Espera 2 segundos entre as tentativas
+      transports: ['websocket', 'polling'],
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 2000
     });
     
     this.bindEvents();
   },
 
   bindEvents: function() {
-    // Limpa ouvintes antigos para evitar vazamento de memória (Memory Leak) na navegação da SPA
-    this.socket.removeAllListeners();
-
     this.socket.on('connect', () => {
       console.log('🔌 Conectado ao servidor Node.js');
       this.socket.emit('join_tenant_room', this.tenantId);
       
-      // Restaura o texto original caso estivesse em erro
       this.safeUpdateDOM('connection-title', 'textContent', 'Conexão Estabelecida');
       this.safeUpdateDOM('connection-subtitle', 'textContent', 'Aguardando status do WhatsApp...');
     });
 
-    // Tratamento de Queda de Servidor (Feedback visual seguro)
     this.socket.on('connect_error', (err) => {
       console.error('Falha na conexão WebSocket:', err.message);
       this.safeUpdateDOM('connection-title', 'textContent', "Servidor Indisponível");
-      this.safeUpdateDOM('connection-subtitle', 'textContent', "Tentando reconectar automaticamente...");
+      this.safeUpdateDOM('connection-subtitle', 'textContent', "Verifique o SSL e a rede.");
     });
 
     this.socket.on('whatsapp_status', (data) => {
@@ -91,13 +81,6 @@ const ConnectionController = {
     });
   },
 
-  // =======================================================================
-  // HELPERS DE BLINDAGEM DE DOM (O Segredo das SPAs Robustas)
-  // =======================================================================
-
-  /**
-   * Atualiza uma propriedade de um elemento HTML apenas se ele existir na tela.
-   */
   safeUpdateDOM: function(elementId, property, value) {
     const el = document.getElementById(elementId);
     if (el) {
@@ -105,9 +88,6 @@ const ConnectionController = {
     }
   },
 
-  /**
-   * Adiciona ou remove uma classe CSS de um elemento HTML apenas se ele existir.
-   */
   safeToggleClass: function(elementId, action, className) {
     const el = document.getElementById(elementId);
     if (el) {
