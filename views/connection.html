@@ -1,37 +1,61 @@
-<div class="fade-in h-full flex flex-col items-center justify-center">
+<div class="fade-in h-full flex flex-col items-center justify-center p-4">
   <div class="mb-8 w-full max-w-md text-center">
-    <h2 class="text-3xl font-bold text-gray-800 mb-2">Conexão com WhatsApp</h2>
-    <p class="text-sm text-gray-500">Vincule o aparelho da sua empresa.</p>
+    <h2 class="text-3xl font-bold text-gray-800 mb-2">Conexão do Aparelho</h2>
+    <p class="text-sm text-gray-500">Controle manual da sessão do Lojabot.</p>
   </div>
 
-  <div id="qr-container" class="bg-white shadow-xl rounded-2xl border border-gray-100 p-8 flex flex-col items-center max-w-md w-full">
-    <h3 class="text-lg font-semibold text-gray-800" id="connection-title">Conectando ao servidor...</h3>
+  <div class="bg-white shadow-xl rounded-2xl border border-gray-100 p-8 flex flex-col items-center max-w-md w-full relative min-h-[350px] justify-center transition-all">
     
-    <p id="connection-subtitle" class="text-sm text-gray-500 mb-4 text-center">Iniciando comunicação segura...</p>
-    
-    <div class="bg-gray-50 p-4 rounded-xl border border-gray-200 h-64 w-64 flex items-center justify-center relative">
-      <div id="qr-loader" class="absolute flex flex-col items-center justify-center">
-         <i class="ph ph-spinner-gap animate-spin text-4xl text-blue-500"></i>
+    <div id="state-disconnected" class="flex flex-col items-center w-full">
+      <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-4 border border-gray-200">
+        <i class="ph ph-plugs text-4xl text-gray-400"></i>
       </div>
-      <img id="qr-image" class="hidden w-full h-full object-contain" alt="Scan QR Code" />
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">WhatsApp Desconectado</h3>
+      <p class="text-sm text-gray-500 text-center mb-6">Inicie o motor da IA para gerar o seu código de acesso.</p>
+      <button id="btn-start-session" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2">
+        <i class="ph ph-power"></i> Conectar WhatsApp
+      </button>
     </div>
 
-    <p class="text-sm text-gray-500 mt-6 text-center">Abra o WhatsApp > Aparelhos Conectados > Conectar Aparelho.</p>
-  </div>
+    <div id="state-loading" class="hidden flex flex-col items-center w-full">
+      <i class="ph ph-spinner-gap animate-spin text-5xl text-blue-500 mb-4"></i>
+      <h3 class="text-lg font-semibold text-gray-800">Acordando o Robô...</h3>
+      <p id="loading-text" class="text-sm text-gray-500 text-center mt-2">Comunicando com a Oracle Cloud.</p>
+    </div>
 
-  <div id="connected-container" class="hidden bg-white shadow-xl border-t-4 border-green-500 rounded-2xl p-8 flex flex-col items-center max-w-md w-full">
-    <i class="ph-fill ph-check-circle text-6xl text-green-500 mb-4"></i>
-    <h3 class="text-2xl font-bold text-gray-900 mb-2">Conectado!</h3>
-    
-    <div class="w-full bg-gray-50 rounded-lg p-4 mt-4 space-y-2">
-      <div class="flex justify-between border-b border-gray-200 pb-2">
-        <span class="text-sm text-gray-500">Número:</span>
-        <span class="text-sm font-semibold text-gray-800" id="connected-number">--</span>
+    <div id="state-qr-ready" class="hidden flex flex-col items-center w-full">
+      <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mb-4 border border-green-200">
+        <i class="ph ph-qr-code text-4xl text-green-600"></i>
       </div>
-      <div class="flex justify-between pt-2">
-        <span class="text-sm text-gray-500">Sessão iniciada:</span>
-        <span class="text-sm font-semibold text-gray-800" id="connected-time">--</span>
+      <h3 class="text-lg font-semibold text-gray-800 mb-2">Código Gerado!</h3>
+      <p class="text-sm text-gray-500 text-center mb-6">O código tem validade curta por segurança. Tenha o celular em mãos.</p>
+      <button id="btn-show-qr" class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 shadow-lg shadow-green-200">
+        <i class="ph ph-eye"></i> Mostrar QR Code
+      </button>
+    </div>
+
+    <div id="state-qr-visible" class="hidden flex flex-col items-center w-full">
+      <div class="relative w-64 h-64 bg-gray-50 rounded-xl border border-gray-200 p-2 mb-4 flex items-center justify-center">
+        <img id="qr-image" class="w-full h-full object-contain" alt="QR Code" />
+        
+        <div class="absolute -top-3 -right-3 w-10 h-10 bg-red-500 text-white font-bold rounded-full flex items-center justify-center shadow-md border-2 border-white text-sm" id="qr-timer">
+          20
+        </div>
+      </div>
+      <h3 class="text-md font-semibold text-gray-800">Aguardando Leitura</h3>
+      <p class="text-xs text-gray-500 text-center mt-1">Abra o WhatsApp > Aparelhos Conectados</p>
+    </div>
+
+    <div id="state-connected" class="hidden flex flex-col items-center w-full">
+      <i class="ph-fill ph-check-circle text-6xl text-green-500 mb-4"></i>
+      <h3 class="text-2xl font-bold text-gray-900 mb-2">Conectado!</h3>
+      <div class="w-full bg-gray-50 rounded-lg p-4 mt-2 space-y-2 border border-gray-200">
+        <div class="flex justify-between border-b border-gray-200 pb-2">
+          <span class="text-sm text-gray-500">Número vinculado:</span>
+          <span class="text-sm font-semibold text-gray-800" id="connected-number">--</span>
+        </div>
       </div>
     </div>
+
   </div>
 </div>
