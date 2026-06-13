@@ -96,6 +96,8 @@ const CatalogController = {
         document.getElementById('prod_qtd').value = prod.qtd;
         document.getElementById('prod_descricao').value = prod.descricao || '';
         document.getElementById('prod_imagem').value = prod.imagens_urls || '';
+        // Novo campo populado na edição
+        document.getElementById('prod_link_loja').value = prod.link_loja || '';
         document.getElementById('prod_disponivel').checked = prod.disponivel;
       }
     } else {
@@ -126,6 +128,8 @@ const CatalogController = {
       qtd: parseInt(document.getElementById('prod_qtd').value),
       descricao: document.getElementById('prod_descricao').value,
       imagens_urls: document.getElementById('prod_imagem').value,
+      // Capturando o novo campo
+      link_loja: document.getElementById('prod_link_loja').value,
       disponivel: document.getElementById('prod_disponivel').checked
     };
     if (id) payload.id = parseInt(id);
