@@ -1,0 +1,78 @@
+<div class="fade-in h-full flex flex-col items-center justify-center p-6 bg-gray-50/50 min-h-[500px]">
+  
+  <div class="mb-8 w-full max-w-md text-center">
+    <div class="inline-flex items-center gap-2 bg-blue-50 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full mb-3 border border-blue-100">
+      <i class="ph-bold ph-lightning"></i> Motor Ultra-Rápido BaileysAtivo
+    </div>
+    <h2 class="text-3xl font-bold text-gray-950 tracking-tight mb-2">Conexão em Tempo Real</h2>
+    <p class="text-sm text-gray-500">Emparelhamento direto via WebSocket sem emulação de navegador.</p>
+  </div>
+
+  <div class="bg-white shadow-xl shadow-gray-200/50 rounded-2xl border border-gray-100 p-8 flex flex-col items-center max-w-md w-full relative min-h-[380px] justify-center transition-all duration-300">
+    
+    <div id="state-disconnected" class="flex flex-col items-center w-full animate-fadeIn">
+      <div class="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center mb-5 border border-gray-100 shadow-inner">
+        <i class="ph ph-link-break text-4xl text-gray-400"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-900 mb-1">Aparelho Desconectado</h3>
+      <p class="text-sm text-gray-500 text-center mb-6 max-w-[280px]">Inicie o canal seguro para gerar o seu código de autenticação.</p>
+      <button id="btn-start-session" class="w-full bg-gray-950 hover:bg-gray-800 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 active:scale-[0.98]">
+        <i class="ph-bold ph-power"></i> Inicializar Instância
+      </button>
+    </div>
+
+    <div id="state-loading" class="hidden flex flex-col items-center w-full text-center animate-fadeIn">
+      <div class="relative flex items-center justify-center mb-5">
+        <div class="w-16 h-16 rounded-full border-4 border-gray-100 border-t-blue-600 animate-spin"></div>
+        <i class="ph-bold ph-cpu absolute text-xl text-blue-600 animate-pulse"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-950">A processar requisição...</h3>
+      <p id="loading-text" class="text-sm text-gray-500 mt-2 max-w-[260px]">Estabelecendo handshake criptográfico com os servidores da Meta.</p>
+    </div>
+
+    <div id="state-qr-ready" class="hidden flex flex-col items-center w-full animate-fadeIn">
+      <div class="w-20 h-20 bg-emerald-50 rounded-2xl flex items-center justify-center mb-5 border border-emerald-100 shadow-sm shadow-emerald-50">
+        <i class="ph-bold ph-qr-code text-4xl text-emerald-600"></i>
+      </div>
+      <h3 class="text-lg font-bold text-gray-950 mb-1">Código Gerado com Sucesso!</h3>
+      <p class="text-sm text-gray-500 text-center mb-6 max-w-[280px]">Por motivos de segurança, o código expira rapidamente. Prepare o seu telemóvel.</p>
+      <button id="btn-show-qr" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3.5 px-4 rounded-xl transition-all duration-200 flex items-center justify-center gap-2 shadow-lg shadow-emerald-100 active:scale-[0.98]">
+        <i class="ph-bold ph-eye"></i> Visualizar QR Code
+      </button>
+    </div>
+
+    <div id="state-qr-visible" class="hidden flex flex-col items-center w-full animate-fadeIn">
+      <div class="relative w-64 h-64 bg-gray-50 rounded-2xl border-2 border-gray-100 p-3 mb-5 flex items-center justify-center shadow-inner">
+        <img id="qr-image" class="w-full h-full object-contain rounded-xl select-none" alt="WhatsApp QR Code" />
+        
+        <div class="absolute -top-3 -right-3 min-w-10 h-10 px-2 bg-rose-600 text-white font-bold rounded-full flex items-center justify-center shadow-lg border-4 border-white text-sm tracking-tighter" id="qr-timer">
+          20
+        </div>
+      </div>
+      <h3 class="text-md font-bold text-gray-900 tracking-tight">Aguardando Leitura Otimizada</h3>
+      <p class="text-xs text-gray-500 text-center mt-1">Abra o WhatsApp > Aparelhos Conectados > Conectar Aparelho</p>
+    </div>
+
+    <div id="state-connected" class="hidden flex flex-col items-center w-full text-center animate-fadeIn">
+      <div class="w-20 h-20 bg-blue-50 rounded-full flex items-center justify-center mb-5 border border-blue-100 shadow-sm">
+        <i class="ph-fill ph-check-circle text-5xl text-blue-600"></i>
+      </div>
+      <h3 class="text-2xl font-black text-gray-900 tracking-tight mb-2">Motor Conectado!</h3>
+      
+      <div class="w-full bg-gray-50 rounded-xl p-4 mt-2 space-y-2 border border-gray-100 text-left">
+        <div class="flex justify-between items-center py-1">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Canal Ativo:</span>
+          <span class="text-sm font-semibold text-gray-800 bg-white px-2.5 py-1 rounded-md border border-gray-200 flex items-center gap-1.5 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+            WhatsApp API
+          </span>
+        </div>
+        <div class="flex justify-between items-center pt-2 border-t border-gray-200/60">
+          <span class="text-xs font-medium text-gray-400 uppercase tracking-wider">Número Vinculado:</span>
+          <span class="text-sm font-mono font-bold text-gray-900" id="connected-number">--</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
