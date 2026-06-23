@@ -108,16 +108,22 @@ const ConnectionController = {
   },
 
   showPairingCode: function(code) {
+    console.log("🎨 A desenhar o Pairing Code no ecrã:", code);
     this.switchState('pairing-ready');
     const displayEl = document.getElementById('pairing-code-display');
     
     if (displayEl && code) {
-      // O código costuma vir como "ABCD1234". Vamos formatar como "ABCD - 1234" para facilitar a leitura.
-      const formattedCode = code.match(/.{1,4}/g).join(' - ');
-      displayEl.textContent = formattedCode;
+      try {
+        // 🔥 VACINA 3: Remove qualquer formatação suja e força blocos de 4
+        const cleanCode = String(code).replace(/[^a-zA-Z0-9]/g, '');
+        const formattedCode = cleanCode.match(/.{1,4}/g).join(' - ');
+        displayEl.textContent = formattedCode;
+      } catch (err) {
+        console.error("Erro ao formatar código visualmente:", err);
+        displayEl.textContent = code; // Fallback de segurança absoluto
+      }
     }
   },
-
   showConnected: function(number) {
     this.switchState('connected');
     const el = document.getElementById('connected-number');
