@@ -2,7 +2,7 @@ const ConnectionController = {
   socket: null,
   tenantId: null,
   isProcessing: false,
-  currentPairingCode: null, // Memória isolada para o código
+  currentPairingCode: null,
 
   init: function() {
     const tenantStr = localStorage.getItem('lojabot_tenant');
@@ -13,9 +13,11 @@ const ConnectionController = {
     
     this.tenantId = JSON.parse(tenantStr).id;
 
+    // Configuração de URL baseada no ambiente
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const serverUrl = isLocalhost ? 'http://localhost:3001' : 'https://chatbotapi.mooo.com';
 
+    // Evita duplicação de sockets
     if (this.socket && this.socket.connected) {
       this.socket.emit('request_current_status', this.tenantId);
       this.bindDOMEvents();
@@ -25,6 +27,7 @@ const ConnectionController = {
     this.socket = io(serverUrl, { transports: ['websocket', 'polling'] });
     this.bindSocketEvents();
     this.bindDOMEvents();
+    this.bindInputMasks();
   },
 
   // ==========================================
@@ -32,71 +35,78 @@ const ConnectionController = {
   // ==========================================
   bindSocketEvents: function() {
     this.socket.on('connect', () => {
-      console.log('🔌 Conectado ao Gateway. Solicitando estado da máquina...');
+      console.log('🔌 Conectado ao Gateway Node.js. Solicitando estado da FSM...');
       this.socket.emit('request_current_status', this.tenantId);
     });
 
     this.socket.on('whatsapp_status', (data) => {
-      console.log(`📊 Transição de Estado: [${data.state}]`);
+      console.log(`📊 Transição de Estado Recebida: [${data.state}]`);
       this.isProcessing = false; 
       
       switch(data.state) {
         case 'DISCONNECTED':
+          // Se houve erro de rede ou o código expirou/foi recusado
+          this.currentPairingCode = null;
           this.switchState('disconnected');
           if (data.error) {
-            alert(`Falha na Conexão: ${data.error}`);
+            this.showError(data.error);
           }
           break;
           
         case 'STARTING':
+          this.hideError();
           this.switchState('loading');
-          this.updateLoadingText('A criar instância segura com a Meta...');
+          this.updateLoadingText('A alocar instância segura nos servidores...');
           break;
           
         case 'PAIRING_CODE_READY':
-          // REGRA 2: O sistema recebeu o código, guarda na memória e mostra o botão!
+          // REGRA 2: Servidor gerou o código. Escondemos e mostramos o botão de revelar.
           if (data.code) {
             this.currentPairingCode = data.code;
             this.switchState('pairing-ready');
           } else {
-            console.error("Servidor reportou PAIRING_CODE_READY mas não enviou o código.");
+            console.error("Erro Crítico: Estado PAIRING_CODE_READY recebido sem o código no payload.");
+            this.showError("Ocorreu uma falha na geração do código. Tente novamente.");
             this.switchState('disconnected');
           }
           break;
           
         case 'CONNECTED':
-          // REGRA 4: Conexão bem sucedida. Mostra a tela final.
-          this.currentPairingCode = null; // Limpa da memória por segurança
-          this.showConnected(data.number);
+          // REGRA 4: WhatsApp conectado. Sucesso total.
+          this.currentPairingCode = null;
+          this.switchState('connected');
+          this.renderConnectedNumber(data.number);
           break;
       }
     });
 
     this.socket.on('disconnect', () => {
       this.switchState('loading');
-      this.updateLoadingText('Tentando reconectar ao servidor interno...');
+      this.updateLoadingText('A rede caiu. Tentando reestabelecer ligação...');
     });
   },
 
   // ==========================================
-  // EVENTOS DE CLIQUE DO UTILIZADOR
+  // EVENTOS DE INTERAÇÃO DO UTILIZADOR
   // ==========================================
   bindDOMEvents: function() {
     const btnRequestCode = document.getElementById('btn-request-code');
     const btnShowCode = document.getElementById('btn-show-code');
-    const btnCancel = document.getElementById('btn-cancel-pairing');
+    const btnCancel1 = document.getElementById('btn-cancel-pairing-1');
+    const btnCancel2 = document.getElementById('btn-cancel-pairing-2');
 
-    // REGRA 1: Usuário preenche e clica em conectar
+    // REGRA 1: Validar input e pedir código
     if (btnRequestCode) {
       btnRequestCode.onclick = () => {
         if (this.isProcessing) return;
+        this.hideError();
 
         const ddi = document.getElementById('country-code').value;
         const phoneInput = document.getElementById('phone-number').value;
-        const cleanPhone = phoneInput.replace(/\D/g, ''); // Limpa espaços e traços
+        const cleanPhone = phoneInput.replace(/\D/g, ''); // Garante apenas números
 
         if (cleanPhone.length < 10) {
-          alert("Por favor, informe um número de telefone válido com o DDD.");
+          this.showError("Por favor, digite um número válido com o código de área (DDD).");
           return;
         }
 
@@ -104,9 +114,8 @@ const ConnectionController = {
         
         this.isProcessing = true;
         this.switchState('loading');
-        this.updateLoadingText('A solicitar código de emparelhamento...');
+        this.updateLoadingText('A solicitar credenciais à Meta...');
         
-        // Dispara para o Backend gerar o código
         this.socket.emit('action_request_pairing_code', { 
             tenantId: this.tenantId, 
             phoneNumber: fullNumber 
@@ -114,11 +123,11 @@ const ConnectionController = {
       };
     }
 
-    // REGRA 3: Após clique no botão, mostra o código em ecrã
+    // REGRA 3: O utilizador atesta que está pronto para ver o código
     if (btnShowCode) {
       btnShowCode.onclick = () => {
         if (!this.currentPairingCode) {
-          alert("Erro: O código não foi encontrado em memória. Tente gerar novamente.");
+          this.showError("O código expirou da memória. Por favor, gere novamente.");
           this.switchState('disconnected');
           return;
         }
@@ -126,17 +135,29 @@ const ConnectionController = {
       };
     }
 
-    // Botão auxiliar de cancelamento
-    if (btnCancel) {
-      btnCancel.onclick = () => {
-        this.currentPairingCode = null;
-        this.switchState('disconnected');
-      }
+    // Fluxos de Cancelamento (Reseta a interface)
+    const handleCancel = () => {
+      this.currentPairingCode = null;
+      document.getElementById('phone-number').value = ''; // Limpa o campo
+      this.switchState('disconnected');
+    };
+
+    if (btnCancel1) btnCancel1.onclick = handleCancel;
+    if (btnCancel2) btnCancel2.onclick = handleCancel;
+  },
+
+  bindInputMasks: function() {
+    // Impede o utilizador de colar letras ou símbolos no campo de telefone
+    const phoneInput = document.getElementById('phone-number');
+    if (phoneInput) {
+      phoneInput.addEventListener('input', function(e) {
+        this.value = this.value.replace(/[^0-9]/g, '');
+      });
     }
   },
 
   // ==========================================
-  // HELPERS DE RENDERIZAÇÃO E FORMATAÇÃO
+  // MANIPULAÇÃO DO DOM E ESTADOS VISUAIS
   // ==========================================
 
   switchState: function(stateName) {
@@ -144,10 +165,27 @@ const ConnectionController = {
     states.forEach(s => {
       const el = document.getElementById(`state-${s}`);
       if (el) {
-        if (s === stateName) el.classList.remove('hidden');
-        else el.classList.add('hidden');
+        if (s === stateName) {
+          el.classList.remove('hidden');
+        } else {
+          el.classList.add('hidden');
+        }
       }
     });
+  },
+
+  showError: function(message) {
+    const errorBox = document.getElementById('error-alert');
+    const errorMsg = document.getElementById('error-message');
+    if (errorBox && errorMsg) {
+      errorMsg.textContent = message;
+      errorBox.classList.remove('hidden');
+    }
+  },
+
+  hideError: function() {
+    const errorBox = document.getElementById('error-alert');
+    if (errorBox) errorBox.classList.add('hidden');
   },
 
   updateLoadingText: function(text) {
@@ -161,28 +199,28 @@ const ConnectionController = {
     
     if (displayEl && rawCode) {
       try {
-        // Formata o código para a leitura humana (ex: ABCD - 1234)
+        // Ex: De "ABCD1234" para "ABCD - 1234"
         const cleanCode = String(rawCode).replace(/[^a-zA-Z0-9]/g, '');
         const formattedCode = cleanCode.match(/.{1,4}/g).join(' - ');
         displayEl.textContent = formattedCode;
       } catch (err) {
-        console.warn("Falha ao formatar código visualmente. Exibindo raw:", err);
+        console.warn("[FSM] Falha ao formatar código. A exibir em modo raw.", err);
         displayEl.textContent = rawCode; 
       }
     }
   },
 
-  showConnected: function(number) {
-    this.switchState('connected');
+  renderConnectedNumber: function(number) {
     const el = document.getElementById('connected-number');
-    if (el) {
-      // Adiciona o "+" à frente do número para ficar padrão internacional
-      el.textContent = number.toString().startsWith('+') ? number : `+${number}`;
+    if (el && number) {
+      // Garante formatação internacional bonita na tela final
+      const strNum = String(number);
+      el.textContent = strNum.startsWith('+') ? strNum : `+${strNum}`;
     }
   }
 };
 
-// Auto-inicialização segura após carregamento do DOM
+// Injeta o controlador quando o DOM estiver completamente pronto
 document.addEventListener('DOMContentLoaded', () => {
     ConnectionController.init();
 });
