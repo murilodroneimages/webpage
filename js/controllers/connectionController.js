@@ -1,23 +1,19 @@
 const ConnectionController = {
   socket: null,
   tenantId: null,
-  isProcessing: false,
-  currentPairingCode: null,
+  timerInterval: null,
+  timeLeft: 20,
 
   init: function() {
     const tenantStr = localStorage.getItem('lojabot_tenant');
-    if (!tenantStr) {
-      window.location.href = '/webpage/login.html';
-      return;
-    }
+    if (!tenantStr) return window.location.href = '/webpage/login.html';
     
     this.tenantId = JSON.parse(tenantStr).id;
 
-    // Configuração de URL baseada no ambiente
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
     const serverUrl = isLocalhost ? 'http://localhost:3001' : 'https://chatbotapi.mooo.com';
 
-    // Evita duplicação de sockets
+    // Se o socket já existe, garante que pede o status atualizado da sessão
     if (this.socket && this.socket.connected) {
       this.socket.emit('request_current_status', this.tenantId);
       this.bindDOMEvents();
@@ -27,200 +23,108 @@ const ConnectionController = {
     this.socket = io(serverUrl, { transports: ['websocket', 'polling'] });
     this.bindSocketEvents();
     this.bindDOMEvents();
-    this.bindInputMasks();
   },
 
-  // ==========================================
-  // COMUNICAÇÃO COM O SERVIDOR (WEBSOCKETS)
-  // ==========================================
   bindSocketEvents: function() {
     this.socket.on('connect', () => {
-      console.log('🔌 Conectado ao Gateway Node.js. Solicitando estado da FSM...');
+      console.log('🔌 Conectado ao servidor Node.js. Requisitando estado...');
+      // Pergunta para a Oracle Cloud: "Como está o motor do meu WhatsApp agora?"
       this.socket.emit('request_current_status', this.tenantId);
     });
 
     this.socket.on('whatsapp_status', (data) => {
-      console.log(`📊 Transição de Estado Recebida: [${data.state}]`);
-      this.isProcessing = false; 
+      console.log('📊 Status recebido do servidor:', data.state);
       
-      switch(data.state) {
-        case 'DISCONNECTED':
-          // Se houve erro de rede ou o código expirou/foi recusado
-          this.currentPairingCode = null;
-          this.switchState('disconnected');
-          if (data.error) {
-            this.showError(data.error);
-          }
-          break;
-          
-        case 'STARTING':
-          this.hideError();
-          this.switchState('loading');
-          this.updateLoadingText('A alocar instância segura nos servidores...');
-          break;
-          
-        case 'PAIRING_CODE_READY':
-          // REGRA 2: Servidor gerou o código. Escondemos e mostramos o botão de revelar.
-          if (data.code) {
-            this.currentPairingCode = data.code;
-            this.switchState('pairing-ready');
-          } else {
-            console.error("Erro Crítico: Estado PAIRING_CODE_READY recebido sem o código no payload.");
-            this.showError("Ocorreu uma falha na geração do código. Tente novamente.");
-            this.switchState('disconnected');
-          }
-          break;
-          
-        case 'CONNECTED':
-          // REGRA 4: WhatsApp conectado. Sucesso total.
-          this.currentPairingCode = null;
-          this.switchState('connected');
-          this.renderConnectedNumber(data.number);
-          break;
+      if (data.state === 'DISCONNECTED') {
+        this.switchState('disconnected');
+      }
+      if (data.state === 'STARTING') {
+        this.switchState('loading');
+        document.getElementById('loading-text').textContent = 'Iniciando o navegador no servidor...';
+      }
+      if (data.state === 'QR_READY') {
+        // Se o servidor já gerou o QR nos bastidores, ativa o botão de mostrar imediatamente!
+        this.switchState('qr-ready');
+      }
+      if (data.state === 'CONNECTED') {
+        this.showConnected(data.number);
       }
     });
 
-    this.socket.on('disconnect', () => {
-      this.switchState('loading');
-      this.updateLoadingText('A rede caiu. Tentando reestabelecer ligação...');
+    this.socket.on('deliver_qr_code', (qrBase64) => {
+      this.switchState('qr-visible');
+      document.getElementById('qr-image').src = qrBase64;
+      this.startCountdown();
+    });
+
+    this.socket.on('whatsapp_ready', (data) => {
+      this.stopCountdown();
+      this.showConnected(data.number);
     });
   },
 
-  // ==========================================
-  // EVENTOS DE INTERAÇÃO DO UTILIZADOR
-  // ==========================================
+  // Vincula as ações de Clique nos Botões
   bindDOMEvents: function() {
-    const btnRequestCode = document.getElementById('btn-request-code');
-    const btnShowCode = document.getElementById('btn-show-code');
-    const btnCancel1 = document.getElementById('btn-cancel-pairing-1');
-    const btnCancel2 = document.getElementById('btn-cancel-pairing-2');
+    const btnStart = document.getElementById('btn-start-session');
+    const btnShowQR = document.getElementById('btn-show-qr');
 
-    // REGRA 1: Validar input e pedir código
-    if (btnRequestCode) {
-      btnRequestCode.onclick = () => {
-        if (this.isProcessing) return;
-        this.hideError();
-
-        const ddi = document.getElementById('country-code').value;
-        const phoneInput = document.getElementById('phone-number').value;
-        const cleanPhone = phoneInput.replace(/\D/g, ''); // Garante apenas números
-
-        if (cleanPhone.length < 10) {
-          this.showError("Por favor, digite um número válido com o código de área (DDD).");
-          return;
-        }
-
-        const fullNumber = `${ddi}${cleanPhone}`;
-        
-        this.isProcessing = true;
+    if (btnStart) {
+      btnStart.onclick = () => {
         this.switchState('loading');
-        this.updateLoadingText('A solicitar credenciais à Meta...');
-        
-        this.socket.emit('action_request_pairing_code', { 
-            tenantId: this.tenantId, 
-            phoneNumber: fullNumber 
-        });
+        document.getElementById('loading-text').textContent = 'Iniciando container no servidor...';
+        this.socket.emit('action_start_session', this.tenantId);
       };
     }
 
-    // REGRA 3: O utilizador atesta que está pronto para ver o código
-    if (btnShowCode) {
-      btnShowCode.onclick = () => {
-        if (!this.currentPairingCode) {
-          this.showError("O código expirou da memória. Por favor, gere novamente.");
-          this.switchState('disconnected');
-          return;
-        }
-        this.renderPairingCode(this.currentPairingCode);
+    if (btnShowQR) {
+      btnShowQR.onclick = () => {
+        this.switchState('loading');
+        document.getElementById('loading-text').textContent = 'Buscando imagem segura...';
+        this.socket.emit('action_get_qr', this.tenantId);
       };
-    }
-
-    // Fluxos de Cancelamento (Reseta a interface)
-    const handleCancel = () => {
-      this.currentPairingCode = null;
-      document.getElementById('phone-number').value = ''; // Limpa o campo
-      this.switchState('disconnected');
-    };
-
-    if (btnCancel1) btnCancel1.onclick = handleCancel;
-    if (btnCancel2) btnCancel2.onclick = handleCancel;
-  },
-
-  bindInputMasks: function() {
-    // Impede o utilizador de colar letras ou símbolos no campo de telefone
-    const phoneInput = document.getElementById('phone-number');
-    if (phoneInput) {
-      phoneInput.addEventListener('input', function(e) {
-        this.value = this.value.replace(/[^0-9]/g, '');
-      });
     }
   },
 
   // ==========================================
-  // MANIPULAÇÃO DO DOM E ESTADOS VISUAIS
+  // HELPERS DE TELA E TIMER
   // ==========================================
+  
+  startCountdown: function() {
+    this.stopCountdown(); // Garante que não tem outro rodando
+    this.timeLeft = 20;
+    const timerEl = document.getElementById('qr-timer');
+    timerEl.textContent = this.timeLeft;
+
+    this.timerInterval = setInterval(() => {
+      this.timeLeft--;
+      timerEl.textContent = this.timeLeft;
+
+      if (this.timeLeft <= 0) {
+        this.stopCountdown();
+        // O tempo acabou, esconde o QR e volta pro botão "Mostrar QR"
+        this.switchState('qr-ready');
+      }
+    }, 1000);
+  },
+
+  stopCountdown: function() {
+    if (this.timerInterval) clearInterval(this.timerInterval);
+  },
 
   switchState: function(stateName) {
-    const states = ['disconnected', 'loading', 'pairing-ready', 'pairing-visible', 'connected'];
+    const states = ['disconnected', 'loading', 'qr-ready', 'qr-visible', 'connected'];
     states.forEach(s => {
       const el = document.getElementById(`state-${s}`);
       if (el) {
-        if (s === stateName) {
-          el.classList.remove('hidden');
-        } else {
-          el.classList.add('hidden');
-        }
+        if (s === stateName) el.classList.remove('hidden');
+        else el.classList.add('hidden');
       }
     });
   },
 
-  showError: function(message) {
-    const errorBox = document.getElementById('error-alert');
-    const errorMsg = document.getElementById('error-message');
-    if (errorBox && errorMsg) {
-      errorMsg.textContent = message;
-      errorBox.classList.remove('hidden');
-    }
-  },
-
-  hideError: function() {
-    const errorBox = document.getElementById('error-alert');
-    if (errorBox) errorBox.classList.add('hidden');
-  },
-
-  updateLoadingText: function(text) {
-    const el = document.getElementById('loading-text');
-    if (el) el.textContent = text;
-  },
-
-  renderPairingCode: function(rawCode) {
-    this.switchState('pairing-visible');
-    const displayEl = document.getElementById('pairing-code-display');
-    
-    if (displayEl && rawCode) {
-      try {
-        // Ex: De "ABCD1234" para "ABCD - 1234"
-        const cleanCode = String(rawCode).replace(/[^a-zA-Z0-9]/g, '');
-        const formattedCode = cleanCode.match(/.{1,4}/g).join(' - ');
-        displayEl.textContent = formattedCode;
-      } catch (err) {
-        console.warn("[FSM] Falha ao formatar código. A exibir em modo raw.", err);
-        displayEl.textContent = rawCode; 
-      }
-    }
-  },
-
-  renderConnectedNumber: function(number) {
+  showConnected: function(number) {
+    this.switchState('connected');
     const el = document.getElementById('connected-number');
-    if (el && number) {
-      // Garante formatação internacional bonita na tela final
-      const strNum = String(number);
-      el.textContent = strNum.startsWith('+') ? strNum : `+${strNum}`;
-    }
+    if (el) el.textContent = `+${number}`;
   }
 };
-
-// Injeta o controlador quando o DOM estiver completamente pronto
-document.addEventListener('DOMContentLoaded', () => {
-    ConnectionController.init();
-});
